@@ -1,0 +1,16 @@
+(executable
+ (name main)
+ (modules ast lexer parser type_checker main)
+ (libraries str)
+)
+
+
+(rule
+ (targets lexer.ml)
+ (deps lexer.mll)
+ (action (run ocamllex %{dep:lexer.mll})))
+
+(rule
+ (targets parser.ml parser.mli)
+ (deps parser.mly)
+ (action (run ocamlyacc %{dep:parser.mly})))

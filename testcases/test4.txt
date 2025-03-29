@@ -1,0 +1,16 @@
+a := 5;
+b := 10;
+c := a + b * 2;
+
+if (c > 20) then {
+    Print(a);
+    Print(b);
+    Print(c);
+} else {
+    Print(a);
+    c := c + 5;
+    Print(c);
+};
+
+d := a + c / b;
+Print(d);

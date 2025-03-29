@@ -1,0 +1,25 @@
+(* This is a comment *)
+Input();               (* Input without arguments *)
+Input(Enter value);  (* Input with arguments *)
+
+(* Identifiers *)
+x := 10;
+y := 20.5;
+result := x + y;
+Print(result);
+
+(* Boolean values *)
+is_valid := true;
+is_active := false;
+
+(* Relational operations *)
+if (x < y) then {
+    Print(x);
+} else {
+    Print(y);
+};
+
+(* Mathematical operations *)
+a := 5 * 3 + 2;
+b := (10 - 4) / 2;
+c := abs(-15);

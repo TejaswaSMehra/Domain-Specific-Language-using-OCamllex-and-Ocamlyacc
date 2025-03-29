@@ -1,0 +1,26 @@
+a := 0;
+b := 10;
+c := 1;
+
+for (i := 0; 10; 1) {
+    for (j := 0; 10; 1) {
+        c := c + (i * j);
+        if (c > 100) then {
+            a := a + c / (i + 1);
+        } else {
+            b := b - i - j;
+        };
+
+        if (a > b) then {
+            Print(a);
+            Print(b);
+        };
+    };
+
+    b := b + i * 2;
+    c := c / 2;
+};
+
+Print(a);
+Print(b);
+Print(c);

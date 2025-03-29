@@ -1,0 +1,38 @@
+5. Assignment 3 (c) -- building an interpreter
+
+This is the third part of the open-ended design exercise for you to design a small programming language that manipulates vectors and matrices.   The test programs you will ultimately have to code in your own language will be, e.g., transposing a matrix,  inverting a matrix, finding determinants,  An ambitious one will be to write Gaussian elimination in your language.
+
+Befor this part of the assignment, you would have to specified the LEXICAL and GRAMMATICAL ELEMENTS in your language -- using OCaml-Lex and OCaml-Yacc, implementing a  lexer and parser, and created an abstract syntax tree for each input program or returning appropriate error messages.   REMEMBER, good error messages are the mark of a good compiler/interpreter.
+
+Please ensure that you correct the grammar of the language to be Yacc-implementable with no reduce-reduce conflicts, and all shift-reduce conflicts resolved (you may use precedence levels for operators to do so)
+
+In this part, you need to interpret the  (well-typed) ASTs you have created with (an extension of) the module you created in the first assignment  -- you may suitably modify the implementation to cater to features which you had not anticipated, but should clearly mark all new code. 
+
+(1) The output of this phase will be an interpreter for your language for manipulating vectors and matrices.  You may have to extend the eval function appropriately.
+
+(2) You should provide enough test programs written in your toy language, and should that these programs are interpretable and yield the correct answers.  
+
+(3) You should also include enough lexically, grammatically and ill-typed WRONG programs (if you have not already done so in parts a and b of this assignment) to show that your interpreter catches errors.  You should also include programs that raise run-time errors.
+
+(4) The TAs will specify example programs in pseudo-code or some other language.  You should render these in your DSL, and interpret these, yielding the desired results.
+
+
+As before the syntactic/lexical elements  of your DSL should include:
+
+    Input-Output commands to read in matrices, vectors, floats, integers, etc.   You need to support at least  Input(  <filename> ) and Input( )  as well as Print(<identifier>)
+    Variables -- whether boolean, integer, scalar, vector, or matrix  variables.    Typically your variables should at least be some variation of alphanumeric and may have primes and underscores.
+    Type names and constructions:  our types include booleans, integers, floats (scalars), vectors of dimension n, and m x n matrices.
+    Data: For each type we will have their constants and operations on them 
+
+        Boolean operations including constants, negation, conjunction, disjunction
+        Integer and Float operations including constants,  addition, multiplication, subtraction and division and abs. (all of these both for floats and integers;  for integers you also need equality and comparisons, and remainder]
+        Vectors — delimited using (rectangular) brackets [ and ] with commas as separators; the vector operations include constant vectors of any given dimension, addition of vectors, scalar multiplication, dot product, and angle, magnitude, dimension etc. 
+        Matrices:  m x n matrices modelled in row-major form (as a vector-of-vectors) with operations including constant matrices,  addition of matrices, scalar product with a matrix, matrix multiplication, transpose of a matrix, determinant of square matrices, etc.
+
+Control Constructs  
+
+        Assignment  using := as the assignment symbol
+        Sequencing, with commands separated by semicolons, and sequence blocks delimited by {  and }  (as in C, C++, Java)
+        Conditionals: if_then_else
+        for loops with integer iterator variables and integer variables/constant as loop start/end limits. 
+        while loops with a boolean condition 

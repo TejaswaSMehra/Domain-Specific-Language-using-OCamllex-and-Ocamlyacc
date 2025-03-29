@@ -1,0 +1,25 @@
+m := 3,3
+[[1,2,3];[4,5,6];[7,8,9]];
+t := transpose(m);
+result := 3,3
+[[0,0,0];[0,0,0];[0,0,0]];
+det := determinant(m);
+
+for (i := 0; 3; 1) {
+    for (j := 0; 3; 1) {
+        a := 0;
+    };
+};
+
+if (det > 0) then {
+    m := m matrix_multiply t;
+    Print(m);
+} else {
+    Print(t);
+};
+
+for (i := 0; 3; 1) {
+    for (j := 0; 3; 1) {
+        Print(result);
+    };
+};
