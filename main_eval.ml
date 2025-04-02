@@ -1,3 +1,4 @@
+open Ast
 open Eval
 
 let () =
@@ -6,6 +7,6 @@ let () =
     let program = Parser.program Lexer.token input in
     eval_prog program
   with
-  | Parsing.Parse_error -> Printf.printf "Parse error: %s\n" (Lexing.lexeme_start_p input).pos_fname
+  | Parser.Error -> Printf.printf "Syntax error\n"
+  | Lexer.Lexing_error msg -> Printf.printf "Lexing error: %s\n" msg
   | Eval.RuntimeError msg -> Printf.printf "Runtime error: %s\n" msg
-  | Failure msg -> Printf.printf "Failure: %s\n" msg

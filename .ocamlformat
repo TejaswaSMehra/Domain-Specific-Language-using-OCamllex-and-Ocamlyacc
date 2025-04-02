@@ -1,0 +1,11 @@
+version=0.27.0
+profile=conventional
+wrap-comments=true
+doc-comments=before
+type-decl=compact
+break-separators=after
+cases-exp-indent=4
+let-binding-indent=4
+indicate-multiline-delimiters=space
+space-around-arrays=true
+sequence-style=terminator

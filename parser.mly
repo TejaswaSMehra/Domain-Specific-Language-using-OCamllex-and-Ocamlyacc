@@ -21,9 +21,9 @@ open Ast
 %token ASSIGN SEMICOLON IF THEN ELSE FOR WHILE
 %token EOF
 
-%start program
+%start program expr
 %type <Ast.program> program
-
+%type <Ast.expr> expr
 (* Precedence declarations to resolve shift/reduce conflicts *)
 %left DISJUNCTION
 %left CONJUNCTION
@@ -51,7 +51,6 @@ stmt:
       | Var(v) -> Assign(v, $3)
       | _      -> AssignIndex($1, $3)
     }
-  | INPUT { Input($1) }
   | PRINT { Print($1) }
   | FOR LPAREN stmt SEMICOLON expr SEMICOLON expr RPAREN LCURLY stmt_list RCURLY { For($3, $5, $7, $10) }
   | IF LPAREN expr RPAREN THEN LCURLY stmt_list RCURLY ELSE LCURLY stmt_list RCURLY { If($3, $7, Some $11) }
@@ -121,6 +120,7 @@ primary:
     INTEGER { IntConst($1) }
   | FLOAT { FloatConst($1) }
   | BOOLEAN { BoolConst($1) }
+  | INPUT { Input($1) }
   | IDENTIFIER { Var($1) }
   | VECTOR_FLOAT { let (n, l) = $1 in ConstVector_float(n, l) }
   | VECTOR_INT { let (n, l) = $1 in ConstVector_int(n, l) }
