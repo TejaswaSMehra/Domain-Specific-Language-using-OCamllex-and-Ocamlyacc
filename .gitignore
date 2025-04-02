@@ -6,3 +6,9 @@ test
 .vscode
 # Ignore build artifacts
 _build
+*.cmo
+*.cmi
+*.exe
+lexer.ml
+parser.ml
+parser.mli
