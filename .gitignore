@@ -1,5 +1,8 @@
-bin
+# Ignore compiled binaries
+# Ignore generated libraries
 lib
 test
+test
 .vscode
+# Ignore build artifacts
 _build
