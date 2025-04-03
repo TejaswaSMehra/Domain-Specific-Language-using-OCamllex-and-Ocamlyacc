@@ -1,0 +1,22 @@
+(* Read two scalar values from user *)
+x := Input();
+y := Input();
+z := x + y;
+
+(* Read a matrix from input *)
+m := Input();  (* user enters 2,2\n[[1,2];[3,4]] *)
+
+(* Assign matrix * vector *)
+vec := 1,2
+[[1,2]];
+mv := m matrix_multiply transpose(vec);  (* Will error unless vec is 2x1 matrix *)
+Print(mv);
+
+(* Use conditional on input *)
+t := Input();
+if(t > 10) then {
+  msg := 1;
+} else {
+  msg := 0;
+};
+Print(msg);

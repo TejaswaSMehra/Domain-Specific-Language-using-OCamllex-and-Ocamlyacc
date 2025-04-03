@@ -8,7 +8,7 @@ Print(x);  (* Print statement *)
 
 (* Floats and edge cases *)
 a := 1.0;  (* Simple float *)
-b := 1e-10;  (* Small scientific notation float *)
+b := 1.0e-10;  (* Small scientific notation float *)
 c := 1.7976931348623157e+308;  (* Max float (edge case for OCaml float) *)
 d := -1.0;  (* Negative float *)
 
@@ -38,5 +38,12 @@ angle_between := angle vec1 vec2;
 (* Matrix operations *)
 transpose_mat := transpose (mat1);
 determinant2 := determinant (mat2);
+
+Print(g);  (* Print float addition result *)
+Print(h);  (* Print integer multiplication result *)
+Print(dot_product);  (* Print dot product result *)
+Print(angle_between);  (* Print angle between vectors *)
+Print(transpose_mat);  (* Print transposed matrix *)
+Print(determinant2);  (* Print determinant result *)
 
 (* End of input *)

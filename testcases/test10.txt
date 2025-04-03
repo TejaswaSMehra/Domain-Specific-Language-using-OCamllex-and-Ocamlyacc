@@ -1,0 +1,16 @@
+v := 3
+[3.,4.,0.];
+unit := 3
+[1.,0.,0.];
+theta := angle v unit;
+mag := magnitude(v);
+Print(theta);
+Print(mag);
+
+i := 0;
+dot_sum := 0;
+while(i < 3) {
+  dot_sum := dot_sum + v[i];
+  i := i + 1;
+};
+Print(dot_sum);

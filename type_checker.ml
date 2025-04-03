@@ -88,9 +88,13 @@ let rec type_of_expr env expr =
         | "*", Int, Vector_float n -> Vector_float n
         | "*", Float, Vector_float n -> Vector_float n
         | "*", Int, Matrix_int (a, b) -> Matrix_int (a, b)
-        | "*", Float, Matrix_int (a, b) -> Matrix_float (a, b)
+        | "*", Matrix_int (a, b), Int -> Matrix_int (a, b)
+        | "*", Matrix_float (a, b), Int -> Matrix_float (a, b)
         | "*", Int, Matrix_float (a, b) -> Matrix_float (a, b)
+        | "*", Float, Matrix_int (a, b) -> Matrix_float (a, b)
+        | "*", Matrix_int (a, b), Float -> Matrix_float (a, b)
         | "*", Float, Matrix_float (a, b) -> Matrix_float (a, b)
+        | "*", Matrix_float (a, b), Float -> Matrix_float (a, b)
         | _ -> failwith ("Type error in binary operation: " ^ op) )
     | Abs e -> (
         match type_of_expr env e with
@@ -150,12 +154,42 @@ let rec type_of_expr env expr =
         | Matrix_int (_, b), Int -> Vector_int b
         | Matrix_float (_, b), Int -> Vector_float b
         | _ -> failwith "Type error in index access" )
-    | Input file_name -> (
-        match file_name with
-        | Some id -> (
-            try List.assoc id env
-            with Not_found -> failwith ("Undefined variable: " ^ id) )
-        | None -> failwith "Input statement must have a variable name" )
+    | Input opt_path -> (
+        match opt_path with
+        | Some filepath -> (
+            let chan =
+                try open_in filepath
+                with _ -> failwith ("Could not open file: " ^ filepath)
+            in
+            let lexbuf = Lexing.from_channel chan in
+            try
+              let parsed_expr = Parser.expr Lexer.token lexbuf in
+              close_in chan;
+              let v = type_of_expr env parsed_expr in
+              v
+            with
+            | Parsing.Parse_error ->
+                close_in chan;
+                failwith ("Syntax error in input file: " ^ filepath)
+            | Failure msg ->
+                close_in chan;
+                failwith ("Lexing error: " ^ msg) )
+        | None ->
+            print_string "Enter expression:\n";
+            flush stdout;
+            let line1 = read_line () in
+            let line2 = read_line () in
+            let full_input = line1 ^ "\n" ^ line2 in
+            let lexbuf = Lexing.from_string full_input in
+            try
+                let parsed_expr = Parser.expr Lexer.token lexbuf in
+                type_of_expr env parsed_expr
+            with
+            | Parsing.Parse_error -> failwith
+                ("Syntax error in input expression: " ^ full_input)
+            | Failure msg -> failwith
+                ("Lexing error: " ^ msg) )
+                
 
 let rec type_check_stmt env stmt =
     match stmt with

@@ -9,10 +9,14 @@ dot := 0 --1;
 result[0][0] := 1;
 alpha := result[0][0];
 result := (1*result) + result;
+Print(v);
 for (i := 0; 3; 1) {
     for (j := 0; 3; 1) {
         result[i] := v;
+        Print(result);
+        Print(v);
         sum := sum + result[i][j];
     };
 };
+Print(result);
 Print(sum);

@@ -46,6 +46,8 @@ let rec string_of_expr = function
   | IndexAccess (e1, e2) ->
       Printf.sprintf "IndexAccess(%s, %s)" (string_of_expr e1)
         (string_of_expr e2)
+  | Input (Some filepath) -> Printf.sprintf "Input(Some(%s))" filepath
+  | Input None -> Printf.sprintf "Input(None)"
 
 (* Helper function to print statements as strings for debugging *)
 let rec string_of_stmt = function
@@ -79,8 +81,6 @@ let rec string_of_stmt = function
             "" body
       in
       Printf.sprintf "While(%s, %s)" (string_of_expr cond) s
-  | Input (Some id) -> Printf.sprintf "Input(Some %s)" id
-  | Input None -> "Input(None)"
   | Print s -> Printf.sprintf "Print(%s)" s
   | For (id, start, end_, body) ->
       let s =
@@ -113,5 +113,12 @@ let parse_and_type_check input =
 
 (* Main function to test the DSL *)
 let () =
-    let input = Lexing.from_channel stdin in
-    parse_and_type_check input
+  let input =
+    if Array.length Sys.argv > 1 then
+      let filename = Sys.argv.(1) in
+      Lexing.from_channel (open_in filename)
+    else
+      Lexing.from_channel stdin
+  in
+  parse_and_type_check input
+

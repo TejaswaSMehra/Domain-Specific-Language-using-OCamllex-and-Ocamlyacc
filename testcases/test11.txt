@@ -1,0 +1,11 @@
+M := 3,3
+[[6,1,1];[4,-2,5];[2,8,7]];
+det := determinant(M);
+M := transpose(M);
+if(det > 0) then {
+  Print(M);
+  Print(det);
+} else {
+  Print(M);
+  Print(det);
+};

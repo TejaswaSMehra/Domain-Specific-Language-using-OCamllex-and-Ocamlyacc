@@ -1,0 +1,63 @@
+(* Vector with zeroes, dot with self *)
+v := 3
+[0,0,0];
+zero_dot := v . v;
+Print(zero_dot);  (* Expected: 0 *)
+
+(* Magnitude of a zero vector *)
+zero_mag := magnitude(v);
+Print(zero_mag);  (* Expected: 0.0 *)
+
+(* Angle between identical vectors *)
+v1 := 3
+[1,2,3];
+v2 := 3
+[1,2,3];
+ang := angle v1 v2;
+Print(ang);  (* Expected: 0.0 *)
+
+(* Angle between opposite vectors *)
+v3 := 3
+[-1,-2,-3];
+ang2 := angle v1 v3;
+Print(ang2);  (* Expected: ~π *)
+
+(* Matrix with all identical rows — det should be 0 *)
+m := 3,3
+[[1,2,3];[1,2,3];[1,2,3]];
+d := determinant(m);
+Print(d);  (* Expected: 0 *)
+
+(* Index assignment to a vector — isolate result first *)
+vec := 3
+[1,2,3];
+vec[2] := 99;
+res := vec[2];
+Print(res);  (* Expected: 99 *)
+
+(* Overwrite matrix element *)
+mat := 2,2
+[[1,2];[3,4]];
+mat[1][1] := 42;
+x := mat[1][1];
+Print(x);  (* Expected: 42 *)
+
+(* Loop with no iterations *)
+i := 0;
+while(i < 0) {
+  i := i + 1;
+};
+Print(i);  (* Expected: 0 *)
+
+(* For loop with reverse bounds — no iterations *)
+v := 3
+[0,0,0];
+for(j := 5; 3; 1) {
+  v[0] := v[0] + 1;
+};
+count := v[0];
+Print(count);  (* Expected: 0 *)
+
+(* Confirm prints on vector and matrix work via variable name *)
+Print(vec);
+Print(mat);

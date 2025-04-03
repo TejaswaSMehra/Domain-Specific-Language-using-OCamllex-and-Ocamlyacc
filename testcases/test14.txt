@@ -1,0 +1,37 @@
+(* Initialize a 3x3 matrix and a vector *)
+M := 3,3
+[[2,0,1];[3,5,6];[1,1,1]];
+v := 3
+[1,2,3];
+v := v * 1;  (* Ensure v is a float vector *)
+
+result := 3
+[0,0,0];
+
+i := 0;
+while(i < 3) {
+  sum := 0;
+  j := 0;
+  while(j < 3) {
+    sum := sum + M[i][j] * v[j];
+    j := j + 1;
+  };
+  result[i] := sum;
+  i := i + 1;
+};
+
+(* Compute magnitude of the result vector *)
+res_mag := magnitude(result);
+
+(* Compare magnitude with a threshold *)
+threshold := 15;
+if(res_mag > threshold) then {
+  decision := 1;
+} else {
+  decision := 0;
+};
+
+(* Print everything *)
+Print(res_mag);
+Print(decision);
+Print(result);

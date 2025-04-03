@@ -1,0 +1,6 @@
+x := Input(input.txt);
+x := x + 1;
+Print(x);
+x := Input();
+x := x + 1;
+Print(x);

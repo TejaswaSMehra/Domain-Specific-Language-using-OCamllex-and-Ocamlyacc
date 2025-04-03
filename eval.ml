@@ -114,23 +114,23 @@ let rec eval_expr env expr =
         | "==", BoolVal a, BoolVal b -> BoolVal (a = b)
         | "!=", BoolVal a, BoolVal b -> BoolVal (a <> b)
         (* Scalar Multiplication *)
-        | "*", IntVal s, VectorIntVal (n, v) ->
+        | "*", IntVal s, VectorIntVal (n, v) | "*", VectorIntVal (n, v), IntVal s ->
             VectorIntVal (n, List.map (( * ) s) v)
-        | "*", FloatVal s, VectorIntVal (n, v) ->
+        | "*", FloatVal s, VectorIntVal (n, v) | "*", VectorIntVal (n, v), FloatVal s ->
             VectorFloatVal (n, List.map (fun x -> s *. float_of_int x) v)
-        | "*", IntVal s, VectorFloatVal (n, v) ->
+        | "*", IntVal s, VectorFloatVal (n, v) | "*", VectorFloatVal (n, v), IntVal s ->
             VectorFloatVal (n, List.map (fun x -> float_of_int s *. x) v)
-        | "*", FloatVal s, VectorFloatVal (n, v) ->
+        | "*", FloatVal s, VectorFloatVal (n, v) | "*", VectorFloatVal (n, v), FloatVal s ->
             VectorFloatVal (n, List.map (( *. ) s) v)
-        | "*", IntVal s, MatrixIntVal (a, b, m) ->
+        | "*", IntVal s, MatrixIntVal (a, b, m) | "*", MatrixIntVal (a, b, m), IntVal s ->
             MatrixIntVal (a, b, List.map (List.map (( * ) s)) m)
-        | "*", FloatVal s, MatrixIntVal (a, b, m) ->
+        | "*", FloatVal s, MatrixIntVal (a, b, m) | "*", MatrixIntVal (a, b, m), FloatVal s ->
             MatrixFloatVal
               (a, b, List.map (List.map (fun x -> s *. float_of_int x)) m)
-        | "*", IntVal s, MatrixFloatVal (a, b, m) ->
+        | "*", IntVal s, MatrixFloatVal (a, b, m) | "*", MatrixFloatVal (a, b, m), IntVal s ->
             MatrixFloatVal
               (a, b, List.map (List.map (fun x -> float_of_int s *. x)) m)
-        | "*", FloatVal s, MatrixFloatVal (a, b, m) ->
+        | "*", FloatVal s, MatrixFloatVal (a, b, m) | "*", MatrixFloatVal (a, b, m), FloatVal s ->
             MatrixFloatVal (a, b, List.map (List.map (( *. ) s)) m)
         | _ -> raise (RuntimeError "Invalid operation or type mismatch") )
     | Abs e -> (
@@ -156,33 +156,43 @@ let rec eval_expr env expr =
             IntVal (List.fold_left2 (fun acc x y -> acc + (x * y)) 0 a b)
         | _ -> raise (RuntimeError "DotProduct: incompatible types/sizes") )
     | Angle (e1, e2) -> (
+        let clamp x = if x < -1.0 then -1.0 else if x > 1.0 then 1.0 else x in
         let v1 = eval_expr env e1 in
         let v2 = eval_expr env e2 in
         match (v1, v2) with
         | VectorFloatVal (n, a), VectorFloatVal (m, b) when n = m ->
-            FloatVal
-              (acos
-                 ( List.fold_left2 (fun acc x y -> acc +. (x *. y)) 0.0 a b
-                 /. ( sqrt (List.fold_left (fun acc x -> acc +. (x *. x)) 0.0 a)
-                    *. sqrt
-                         (List.fold_left (fun acc x -> acc +. (x *. x)) 0.0 b)
-                    ) ) )
+            let dot =
+                List.fold_left2 (fun acc x y -> acc +. (x *. y)) 0.0 a b
+            in
+            let mag_a =
+                sqrt (List.fold_left (fun acc x -> acc +. (x *. x)) 0.0 a)
+            in
+            let mag_b =
+                sqrt (List.fold_left (fun acc x -> acc +. (x *. x)) 0.0 b)
+            in
+            let cos_theta = clamp (dot /. (mag_a *. mag_b)) in
+            FloatVal (acos cos_theta)
         | VectorIntVal (n, a), VectorIntVal (m, b) when n = m ->
-            IntVal
-              (int_of_float
-                 (acos
-                    ( List.fold_left2
-                        (fun acc x y -> acc +. float_of_int (x * y))
-                        0.0 a b
-                    /. ( sqrt
-                           (List.fold_left
-                              (fun acc x -> acc +. float_of_int (x * x))
-                              0.0 a )
-                       *. sqrt
-                            (List.fold_left
-                               (fun acc x -> acc +. float_of_int (x * x))
-                               0.0 b ) ) ) ) )
-        | _ -> raise (RuntimeError "Angle: incompatible types/sizes") )
+            let dot =
+                List.fold_left2
+                  (fun acc x y -> acc +. float_of_int (x * y))
+                  0.0 a b
+            in
+            let mag_a =
+                sqrt
+                  (List.fold_left
+                     (fun acc x -> acc +. float_of_int (x * x))
+                     0.0 a )
+            in
+            let mag_b =
+                sqrt
+                  (List.fold_left
+                     (fun acc x -> acc +. float_of_int (x * x))
+                     0.0 b )
+            in
+            let cos_theta = clamp (dot /. (mag_a *. mag_b)) in
+            FloatVal (acos cos_theta)
+        | _ -> raise (RuntimeError "Angle: incompatible types or dimensions") )
     | Dimension e -> (
         let v = eval_expr env e in
         match v with
@@ -316,19 +326,21 @@ let rec eval_expr env expr =
                 raise (RuntimeError "Syntax error in input file")
             | Failure msg ->
                 close_in chan;
-                raise (RuntimeError ("Runtime error: " ^ msg)))
-        | None -> (
-            print_string "Enter value:\n";
+                raise (RuntimeError ("Runtime error: " ^ msg)) )
+        | None ->
+            print_string "Enter expression:\n";
             flush stdout;
-            let lexbuf = Lexing.from_channel stdin in
+            let line1 = read_line () in
+            let line2 = read_line () in
+            let full_input = line1 ^ "\n" ^ line2 in
+            let lexbuf = Lexing.from_string full_input in
             try
-              let parsed_expr = Parser.expr Lexer.token lexbuf in
-              let v = eval_expr env parsed_expr in
-              v
+                let parsed_expr = Parser.expr Lexer.token lexbuf in
+                eval_expr env parsed_expr
             with
             | Parsing.Parse_error -> raise (RuntimeError "Syntax error in input")
-            | Failure msg ->
-                raise (RuntimeError ("Lexing error: " ^ msg)) ) )
+            | Failure msg -> raise (RuntimeError ("Lexing error: " ^ msg)))
+                
 
 let rec eval_stmt env stmt =
     match stmt with
@@ -388,6 +400,29 @@ let rec eval_stmt env stmt =
                       mat
                 in
                 MatrixFloatVal (a, b, new_mat)
+            | MatrixIntVal (a, b, mat), [ i ], VectorIntVal (n, lst)
+              when i >= 0 && i < a && n = b ->
+                let new_mat =
+                    List.mapi
+                      (fun row_idx row ->
+                        if row_idx = i then
+                          lst
+                        else row )
+                      mat
+                in
+                MatrixIntVal (List.length mat, n, new_mat)
+            | MatrixFloatVal (a, b, mat), [ i ], VectorFloatVal (n, lst)
+                when i >= 0 && i < a && n = b ->
+                    let new_mat =
+                        List.mapi
+                        (fun row_idx row ->
+                            if row_idx = i then
+                            lst
+                            else row )
+                        mat
+                    in
+                    MatrixFloatVal (List.length mat, n, new_mat)
+                (* Unsupported cases *)
             | _ -> raise (RuntimeError "Invalid or unsupported index assignment")
         in
         (id, updated) :: List.remove_assoc id env
@@ -405,21 +440,21 @@ let rec eval_stmt env stmt =
             | _ -> raise (RuntimeError "While condition must be boolean")
         in
         while_loop env
-    | For (init_stmt, e1, e2, body) -> (
+    | For (init_stmt, end_limit, step, body) -> (
         match init_stmt with
         | Assign (id, e3) -> (
             let env = eval_stmt env init_stmt in
-            let v1 = eval_expr env e1 in
-            let v2 = eval_expr env e2 in
+            let v1 = eval_expr env end_limit in
+            let v2 = eval_expr env step in
             let v3 = eval_expr env e3 in
-            match (v1, v2, v3) with
-            | IntVal i, IntVal j, IntVal _ ->
+            match (v3, v1, v2) with
+            | IntVal i, IntVal j, IntVal d ->
                 let rec for_loop env k =
-                    if k > j then env
+                    if k >= j then env
                     else
                       let env' = (id, IntVal k) :: List.remove_assoc id env in
                       let env'' = eval_block env' body in
-                      for_loop env'' (k + 1)
+                      for_loop env'' (k + d)
                 in
                 for_loop env i
             | _ -> raise (RuntimeError "For loop bounds must be integers") )
@@ -452,7 +487,8 @@ let rec eval_stmt env stmt =
                        ^ "]" )
                      m )
         in
-        print_endline s;
+        (* print in the form id: s *)
+        print_endline (id ^ ": " ^ s);
         env
 
 and eval_block env stmts = List.fold_left eval_stmt env stmts
